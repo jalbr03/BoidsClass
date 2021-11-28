@@ -1,0 +1,4 @@
+Boids... they are beautiful creatures but you can only watch them haven't you ever wanted to frolic with them?
+Well now you can, show them the world and fight mobs with them (they love that btw) and fly with a flock of Boids.
+
+The boids algorithm is a flocking simulation and looks amazing so i thought why not see it in Terraria?

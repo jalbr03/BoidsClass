@@ -1,0 +1,3 @@
+displayName = Boid class
+author = Jonathan Albright
+version = 0.1

@@ -24,7 +24,7 @@ namespace Boids.Items.weapons
 			ItemID.Sets.GamepadWholeScreenUseRange[Item.type] = true; // This lets the player target anywhere on the whole screen while using a controller
 			ItemID.Sets.LockOnIgnoresCollision[Item.type] = true;
 		}
-	
+
 		public override void SetDefaults()
 		{
 			Item.damage = 30;
@@ -38,22 +38,15 @@ namespace Boids.Items.weapons
 			Item.value = Item.sellPrice(gold: 30);
 			Item.rare = ItemRarityID.White;
 			Item.UseSound = SoundID.Item44; // What sound should play when using the item
-	
-			// These below are needed for a minion weapon
+
 			Item.noMelee = true; // this item doesn't do any melee damage
 			Item.DD2Summon = false;
-			Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); // Makes the damage register as summon. If your item does not have any damage type, it becomes true damage (which means that damage scalars will not affect it). Be sure to have a damage type
+			Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); 
 			Item.buffType = ModContent.BuffType<BoidMinionBuff>();
-			// No buffTime because otherwise the item tooltip would say something like "1 minute duration"
-			
+
 			Item.shoot = ModContent.ProjectileType<BoidMinion>(); // This item creates the minion projectile
 		}
-	
-		// public override bool? UseItem(Player player)
-		// {
-		// 	return true;
-		// }
-	
+
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback) {
 			// Here you can change where the minion is spawned. Most vanilla minions spawn at the cursor position
 			position = Main.MouseWorld;
@@ -71,7 +64,6 @@ namespace Boids.Items.weapons
 			return false;
 		}
 	
-		// Please see Content/ExampleRecipes.cs for a detailed explanation of recipe creation.
 		public override void AddRecipes() {
 			CreateRecipe()
 				.AddIngredient(ItemID.DirtBlock)

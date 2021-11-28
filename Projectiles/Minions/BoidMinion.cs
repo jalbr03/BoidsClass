@@ -12,121 +12,14 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Boids.Projectiles.Minions
 {
-	// This file contains all the code necessary for a minion
-	// - ModItem - the weapon which you use to summon the minion with
-	// - ModBuff - the icon you can click on to despawn the minion
-	// - ModProjectile - the minion itself
-
-	// It is not recommended to put all these classes in the same file. For demonstrations sake they are all compacted together so you get a better overwiew.
-	// To get a better understanding of how everything works together, and how to code minion AI, read the guide: https://github.com/tModLoader/tModLoader/wiki/Basic-Minion-Guide
-	// This is NOT an in-depth guide to advanced minion AI
-
-	// public class BoidMinionBuff : ModBuff
-	// {
-	// 	public override void SetStaticDefaults() {
-	// 		DisplayName.SetDefault("Boid");
-	// 		Description.SetDefault("Fly with the Boids!");
-	//
-	// 		Main.buffNoSave[Type] = true; // This buff won't save when you exit the world
-	// 		Main.buffNoTimeDisplay[Type] = true; // The time remaining won't display on this buff
-	// 	}
-	//
-	// 	public override void Update(Player player, ref int buffIndex) {
-	// 		// If the minions exist reset the buff time, otherwise remove the buff from the player
-	// 		if (player.ownedProjectileCounts[ModContent.ProjectileType<BoidMinion>()] > 0) {
-	// 			player.buffTime[buffIndex] = 18000;
-	// 		}
-	// 		else {
-	// 			player.DelBuff(buffIndex);
-	// 			buffIndex--;
-	// 		}
-	// 	}
-	// 	
-	// }
-
-	// public class StaffOfBoids : ModItem
-	// {
-	// 	
-	// 	public override void SetStaticDefaults() {
-	// 		DisplayName.SetDefault("Boid test");
-	// 		Tooltip.SetDefault("Summons a Boid to fly with you!"); // TODO: chang this!
-	//
-	// 		CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
-	// 		ItemID.Sets.GamepadWholeScreenUseRange[Item.type] = true; // This lets the player target anywhere on the whole screen while using a controller
-	// 		ItemID.Sets.LockOnIgnoresCollision[Item.type] = true;
-	// 	}
-	//
-	// 	public override void SetDefaults()
-	// 	{
-	// 		Item.damage = 30;
-	// 		Item.knockBack = 3f;
-	// 		Item.mana = 0; // mana cost
-	// 		Item.width = 32;
-	// 		Item.height = 32;
-	// 		Item.useTime = 1;
-	// 		Item.useAnimation = 1;
-	// 		Item.useStyle = ItemUseStyleID.Swing; // how the player's arm moves when using the item
-	// 		Item.value = Item.sellPrice(gold: 30);
-	// 		Item.rare = ItemRarityID.White;
-	// 		Item.UseSound = SoundID.Item44; // What sound should play when using the item
-	//
-	// 		// These below are needed for a minion weapon
-	// 		Item.noMelee = true; // this item doesn't do any melee damage
-	// 		Item.DD2Summon = false;
-	// 		Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); // Makes the damage register as summon. If your item does not have any damage type, it becomes true damage (which means that damage scalars will not affect it). Be sure to have a damage type
-	// 		Item.buffType = ModContent.BuffType<BoidMinionBuff>();
-	// 		// No buffTime because otherwise the item tooltip would say something like "1 minute duration"
-	// 		
-	// 		Item.shoot = ModContent.ProjectileType<BoidMinion>(); // This item creates the minion projectile
-	// 	}
-	//
-	// 	// public override bool? UseItem(Player player)
-	// 	// {
-	// 	// 	return true;
-	// 	// }
-	//
-	// 	public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback) {
-	// 		// Here you can change where the minion is spawned. Most vanilla minions spawn at the cursor position
-	// 		position = Main.MouseWorld;
-	// 	}
-	//
-	// 	public override bool Shoot(Player player, ProjectileSource_Item_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) {
-	// 		// This is needed so the buff that keeps your minion alive and allows you to despawn it properly applies
-	// 		player.AddBuff(Item.buffType, 2);
-	//
-	// 		// Minions have to be spawned manually, then have originalDamage assigned to the damage of the summon item
-	// 		var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
-	// 		projectile.originalDamage = Item.damage;
-	//
-	// 		// Since we spawned the projectile manually already, we do not need the game to spawn it for ourselves anymore, so return false
-	// 		return false;
-	// 	}
-	//
-	// 	// Please see Content/ExampleRecipes.cs for a detailed explanation of recipe creation.
-	// 	public override void AddRecipes() {
-	// 		CreateRecipe()
-	// 			.AddIngredient(ItemID.DirtBlock)
-	// 			.AddTile(TileID.WorkBenches)
-	// 			.Register();
-	// 	}
-	// }
-
-	// This minion shows a few mandatory things that make it behave properly. 
-	// Its attack pattern is simple: If an enemy is in range of 43 tiles, it will fly to it and deal contact damage
-	// If the player targets a certain NPC with right-click, it will fly through tiles to it
-	// If it isn't attacking, it will float near the player with minimal movement
 	public class BoidMinion : ModProjectile
 	{
 		private const float MaxDist = 16f;
-		private const float MaxForce = 50f;
 		private const float SeeingRange = 144f;
 		private const float SeeingAngle = 1.2f;
 		private const float Speed = 3f;
 
 		private float tpBuffer = 24f;
-		// private float tpXmax = 1024/2;
-		// private float tpYmax = 1024/2;
-		// private float tpBuffer = 26;
 		
 		public override void SetStaticDefaults() {
 			DisplayName.SetDefault("Example Minion");
@@ -198,28 +91,6 @@ namespace Boids.Projectiles.Minions
 			vectorToIdlePosition = Vector2.Zero;//Projectile.Center;
 			distanceToIdlePosition = 0;//vectorToIdlePosition.Length();
 
-			
-			
-			// if (Math.Abs(Projectile.position.X - owner.position.X) > tpXmax+tpBuffer*2)
-			// {
-			// 	Projectile.position.X = owner.position.X-tpXmax-tpBuffer;
-			// } 
-			// else if (Math.Abs(Projectile.position.X - owner.position.X) < tpBuffer*2)
-			// {
-			// 	Projectile.position.X = owner.position.X+tpXmax+tpBuffer;
-			// }
-			//
-			// if (Math.Abs(Projectile.position.Y - owner.position.Y) > tpYmax+tpBuffer*2)
-			// {
-			// 	Projectile.position.Y = owner.position.Y-tpYmax-tpBuffer;
-			// } 
-			// else if (Math.Abs(Projectile.position.Y - owner.position.Y) < tpBuffer*2)
-			// {
-			// 	Projectile.position.Y = owner.position.Y+tpYmax+tpBuffer;
-			// }
-			
-			// Fix overlap with other minions
-			
 			var avrageVelocityX = 0f;
 			var avrageVelocityY = 0f;
 			
@@ -229,12 +100,6 @@ namespace Boids.Projectiles.Minions
 			var avragePushX = 0f;
 			var avragePushY = 0f;
 			var neighbors = 0;
-			// var dir = (float) Math.Atan2(Projectile.velocity.Y, Projectile.velocity.X);
-			//dir = dir - Math.Sign(dir) * (float) Math.PI;
-			
-			// var dirMouse = (float) Math.Atan2(Main.MouseWorld.Y-Projectile.position.Y, Main.MouseWorld.X-Projectile.position.X);
-			// Main.NewText("tomouse "+ExtraMath.AngleDifference(dir, dirMouse));
-			// Main.NewText("dirMouse "+dirMouse);
 			
 			for (int i = 0; i < Main.maxProjectiles; i++) {
 				Projectile other = Main.projectile[i];
@@ -242,17 +107,7 @@ namespace Boids.Projectiles.Minions
 				if (i != Projectile.whoAmI && other.active && other.owner == Projectile.owner)
 				{
 					var dist = Projectile.position.Distance(other.position);
-					
-					// var xdist = Projectile.position.X - other.position.X;
-					// var ydist = Projectile.position.Y - other.position.Y;
-					//
-					// var xsign = Math.Sign(xdist);
-					// var ysign = Math.Sign(ydist);
-					//
-					// xdist = Math.Abs(xdist);
-					// ydist = Math.Abs(ydist);
-					// var dir2 = (float) Math.Atan2(other.position.Y-Projectile.position.Y, other.position.X-Projectile.position.X);
-					
+
 					// double angleDif = ExtraMath.AngleDifference(dir, dir2);
 					if (dist <= SeeingRange)
 					{
@@ -271,8 +126,6 @@ namespace Boids.Projectiles.Minions
 						double dify = Projectile.position.Y - other.position.Y+Math.Sign(other.position.Y)*0.01;
 						avragePushX += (float) (difx / distToOther);
 						avragePushY += (float) (dify / distToOther);
-						// avragePushX += (MaxDist / (xdist + MaxDist / (MaxForce + 1f)) - 1f)*xsign;
-						// avragePushY += (MaxDist / (ydist + MaxDist / (MaxForce + 1f)) - 1f)*ysign;
 					}
 				}
 			}
@@ -290,12 +143,6 @@ namespace Boids.Projectiles.Minions
 				
 				avragePushX /= neighbors;
 				avragePushY /= neighbors;
-
-				// Main.NewText("avragePushX "+avragePushX);
-				// Main.NewText("avragePushY "+avragePushY);
-				// Main.NewText(Projectile.velocity.X);
-				// Main.NewText(avrageVelocityX);
-				// Main.NewText((Projectile.velocity.X - avrageVelocityX) / 100);
 				
 				targetVelX += (avrageVelocityX - Projectile.velocity.X) / 1f;
 				targetVelY += (avrageVelocityY - Projectile.velocity.Y) / 1f;
@@ -347,8 +194,6 @@ namespace Boids.Projectiles.Minions
 
 			if(!float.IsPositiveInfinity(Math.Abs(num)))
 			{
-				// Projectile.velocity.X = targetVelX*2;
-				// Projectile.velocity.Y = targetVelY*2;
 				Projectile.velocity.X += (targetVelX*Speed - Projectile.velocity.X) / 20f;
 				Projectile.velocity.Y += (targetVelY*Speed - Projectile.velocity.Y) / 20f;
 			}

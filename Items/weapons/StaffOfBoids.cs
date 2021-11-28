@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using Boids.Buffs;
 using Boids.DamageClasses;
 using Boids.General;
 using Boids.Projectiles.Minions;

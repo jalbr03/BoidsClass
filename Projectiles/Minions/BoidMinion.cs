@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using Boids.Buffs;
 using Boids.DamageClasses;
 using Boids.General;
 using Terraria;
@@ -20,28 +21,28 @@ namespace Boids.Projectiles.Minions
 	// To get a better understanding of how everything works together, and how to code minion AI, read the guide: https://github.com/tModLoader/tModLoader/wiki/Basic-Minion-Guide
 	// This is NOT an in-depth guide to advanced minion AI
 
-	public class BoidMinionBuff : ModBuff
-	{
-		public override void SetStaticDefaults() {
-			DisplayName.SetDefault("Boid");
-			Description.SetDefault("Fly with the Boids!");
-
-			Main.buffNoSave[Type] = true; // This buff won't save when you exit the world
-			Main.buffNoTimeDisplay[Type] = true; // The time remaining won't display on this buff
-		}
-
-		public override void Update(Player player, ref int buffIndex) {
-			// If the minions exist reset the buff time, otherwise remove the buff from the player
-			if (player.ownedProjectileCounts[ModContent.ProjectileType<BoidMinion>()] > 0) {
-				player.buffTime[buffIndex] = 18000;
-			}
-			else {
-				player.DelBuff(buffIndex);
-				buffIndex--;
-			}
-		}
-		
-	}
+	// public class BoidMinionBuff : ModBuff
+	// {
+	// 	public override void SetStaticDefaults() {
+	// 		DisplayName.SetDefault("Boid");
+	// 		Description.SetDefault("Fly with the Boids!");
+	//
+	// 		Main.buffNoSave[Type] = true; // This buff won't save when you exit the world
+	// 		Main.buffNoTimeDisplay[Type] = true; // The time remaining won't display on this buff
+	// 	}
+	//
+	// 	public override void Update(Player player, ref int buffIndex) {
+	// 		// If the minions exist reset the buff time, otherwise remove the buff from the player
+	// 		if (player.ownedProjectileCounts[ModContent.ProjectileType<BoidMinion>()] > 0) {
+	// 			player.buffTime[buffIndex] = 18000;
+	// 		}
+	// 		else {
+	// 			player.DelBuff(buffIndex);
+	// 			buffIndex--;
+	// 		}
+	// 	}
+	// 	
+	// }
 
 	// public class StaffOfBoids : ModItem
 	// {

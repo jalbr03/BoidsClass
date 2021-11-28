@@ -17,8 +17,8 @@ namespace Boids.Items.weapons
 	{
 		
 		public override void SetStaticDefaults() {
-			DisplayName.SetDefault("Boid test");
-			Tooltip.SetDefault("Summons a Boid to fly with you!"); // TODO: chang this!
+			DisplayName.SetDefault("Staff of Boids");
+			Tooltip.SetDefault("Take control and make those mindless Boids Fight for YOU!"); // TODO: chang this!
 	
 			CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
 			ItemID.Sets.GamepadWholeScreenUseRange[Item.type] = true; // This lets the player target anywhere on the whole screen while using a controller
@@ -42,9 +42,9 @@ namespace Boids.Items.weapons
 			Item.noMelee = true; // this item doesn't do any melee damage
 			Item.DD2Summon = false;
 			Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); 
-			Item.buffType = ModContent.BuffType<BoidMinionBuff>();
+			Item.buffType = ModContent.BuffType<BoidWallBuff>();
 
-			Item.shoot = ModContent.ProjectileType<BoidMinion>(); // This item creates the minion projectile
+			Item.shoot = ModContent.ProjectileType<BoidWall>(); // This item creates the minion projectile
 		}
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback) {
@@ -66,7 +66,7 @@ namespace Boids.Items.weapons
 	
 		public override void AddRecipes() {
 			CreateRecipe()
-				.AddIngredient(ItemID.DirtBlock)
+				.AddIngredient(ItemID.Wood)
 				.AddTile(TileID.WorkBenches)
 				.Register();
 		}

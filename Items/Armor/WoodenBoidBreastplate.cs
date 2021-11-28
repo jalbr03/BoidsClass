@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using Boids.DamageClasses;
+using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -25,6 +26,7 @@ namespace Boids.Items.Armor
             Item.sellPrice(gold: 1); // How many coins the item is worth
             Item.rare = ItemRarityID.Green; // The rarity of the item
             Item.defense = 1; // The amount of defense the item will give when equipped
+            Item.DamageType = ModContent.GetInstance<BoidDamageClass>();
         }
 
 

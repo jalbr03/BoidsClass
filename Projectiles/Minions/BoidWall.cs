@@ -12,18 +12,12 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Boids.Projectiles.Minions
 {
-	public class BoidMinion : ModProjectile
+	public class BoidWall : ModProjectile
 	{
-		private Random random = new Random();
-		private const float MaxDist = 15f;
-		private const float SeeingRange = 100f;
-		private const float SeeingAngle = 1.2f;
-		private const float Speed = 3f;
-
 		private float tpBuffer = 24f;
 		
 		public override void SetStaticDefaults() {
-			DisplayName.SetDefault("Boids");
+			DisplayName.SetDefault("Boid wall");
 			// Sets the amount of frames this minion has on its spritesheet
 			Main.projFrames[Projectile.type] = 1;
 			// This is necessary for right-click targeting
@@ -55,7 +49,7 @@ namespace Boids.Projectiles.Minions
 
 		// This is mandatory if your minion deals contact damage (further related stuff in AI() in the Movement region)
 		public override bool MinionContactDamage() {
-			return true;
+			return false;
 		}
 		
 		// The AI of this minion is split into multiple methods to avoid bloat. This method just passes values between calls actual parts of the AI.
@@ -75,12 +69,12 @@ namespace Boids.Projectiles.Minions
 		// This is the "active check", makes sure the minion is alive while the player is alive, and despawns if not
 		private bool CheckActive(Player owner) {
 			if (owner.dead || !owner.active) {
-				owner.ClearBuff(ModContent.BuffType<BoidMinionBuff>());
+				owner.ClearBuff(ModContent.BuffType<BoidWallBuff>());
 
 				return false;
 			}
 
-			if (owner.HasBuff(ModContent.BuffType<BoidMinionBuff>())) {
+			if (owner.HasBuff(ModContent.BuffType<BoidWallBuff>())) {
 				Projectile.timeLeft = 2;
 			}
 
@@ -91,89 +85,6 @@ namespace Boids.Projectiles.Minions
 		{
 			vectorToIdlePosition = Vector2.Zero;//Projectile.Center;
 			distanceToIdlePosition = 0;//vectorToIdlePosition.Length();
-
-			var spawnchance = random.Next(0, 100);
-
-			if (spawnchance > 50) return;
-			
-			var avrageVelocityX = 0f;
-			var avrageVelocityY = 0f;
-			
-			var avragePositionX = 0f;
-			var avragePositionY = 0f;
-
-			var avragePushX = 0f;
-			var avragePushY = 0f;
-			var neighbors = 0;
-			
-			for (int i = 0; i < Main.maxProjectiles; i++) {
-				Projectile other = Main.projectile[i];
-				
-				if (i != Projectile.whoAmI && other.active && other.owner == Projectile.owner)
-				{
-					var dist = Projectile.position.Distance(other.position);
-
-					var isWall = other.type == ModContent.ProjectileType<BoidWall>();
-					
-					if (dist < MaxDist)
-					{
-						double distToOther = ExtraMath.PointDistance(Projectile.position, other.position);
-						double difx = Projectile.position.X - other.position.X+Math.Sign(other.position.X)*0.01;
-						double dify = Projectile.position.Y - other.position.Y+Math.Sign(other.position.Y)*0.01;
-						avragePushX += (float) (difx / distToOther) * (isWall ? 30:75);
-						avragePushY += (float) (dify / distToOther) * (isWall ? 30:75);
-					}
-
-					if (dist <= SeeingRange)
-					{
-						neighbors++;
-					}
-
-					if (isWall) continue;
-
-					if (dist <= SeeingRange)
-					{
-						avrageVelocityX += other.velocity.X;
-						avrageVelocityY += other.velocity.Y;
-
-						avragePositionX += other.position.X;
-						avragePositionY += other.position.Y;
-					}
-				}
-			}
-
-			var targetVelX = Projectile.velocity.X;
-			var targetVelY = Projectile.velocity.Y;
-			
-			if (neighbors != 0)
-			{
-				avrageVelocityX /= neighbors;
-				avrageVelocityY /= neighbors;
-				
-				avragePositionX /= neighbors;
-				avragePositionY /= neighbors;
-				
-				avragePushX /= neighbors;
-				avragePushY /= neighbors;
-				
-				targetVelX += (avrageVelocityX - Projectile.velocity.X) / 1f;
-				targetVelY += (avrageVelocityY - Projectile.velocity.Y) / 1f;
-				
-				var midX = avragePositionX - Projectile.position.X;
-				var midY = avragePositionY - Projectile.position.Y;
-				targetVelX += (midX - Projectile.velocity.X) * 0.01f;
-				targetVelY += (midY - Projectile.velocity.Y) * 0.01f;
-
-				targetVelX += avragePushX;
-				targetVelY += avragePushY;
-			}
-
-			// TODO: keep this code
-			// if (owner.position.Distance(Projectile.position) > tpMax)
-			// {
-			// 	targetVelX += (owner.Center.X - Projectile.position.X)/100f;
-			// 	targetVelY += (owner.Center.Y - Projectile.position.Y)/100f;
-			// }
 
 			var maxX = Main.screenWidth / 2;
 			var maxY = Main.screenHeight / 2;
@@ -198,16 +109,6 @@ namespace Boids.Projectiles.Minions
 			else if(Projectile.position.Y < bottom - tpBuffer)
 			{
 				Projectile.position.Y = top;
-			}
-			
-			var num = 1f / (float) Math.Sqrt(targetVelX * targetVelX + targetVelY * targetVelY);
-			targetVelX *= num;
-			targetVelY *= num;
-
-			if(!float.IsPositiveInfinity(Math.Abs(num)))
-			{
-				Projectile.velocity.X += (targetVelX*Speed - Projectile.velocity.X) / 20f;
-				Projectile.velocity.Y += (targetVelY*Speed - Projectile.velocity.Y) / 20f;
 			}
 		}
 

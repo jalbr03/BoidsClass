@@ -1,4 +1,8 @@
-﻿using Boids.Projectiles.Minions;
+﻿using System;
+using Boids.Buffs;
+using Boids.DamageClasses;
+using Boids.ModdedPlayer;
+using Boids.Projectiles.Minions;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
@@ -13,6 +17,8 @@ namespace Boids.Items.Armor
 	[AutoloadEquip(EquipType.Head)]
 	public class WoodenBoidHelmet : ModItem
 	{
+		private Random random = new Random();
+		
 		public override void SetStaticDefaults() {
 			DisplayName.SetDefault("Wooden Boid Helmet");
 			Tooltip.SetDefault("There seams to be a distant chirping," 
@@ -29,6 +35,8 @@ namespace Boids.Items.Armor
 			Item.sellPrice(gold: 1); // How many coins the item is worth
 			Item.rare = ItemRarityID.Green; // The rarity of the item
 			Item.defense = 5; // The amount of defense the item will give when equipped
+			Item.buffType = ModContent.BuffType<BoidMinionBuff>();
+			Item.DamageType = ModContent.GetInstance<BoidDamageClass>();
 		}
 
 		// IsArmorSet determines what armor pieces are needed for the setbonus to take effect
@@ -39,24 +47,38 @@ namespace Boids.Items.Armor
 		// UpdateArmorSet allows you to give set bonuses to the armor.
 		public override void UpdateArmorSet(Player player) {
 			player.setBonus = "Here come the Boids"; // This is the setbonus tooltip
-			Item.shoot = ModContent.ProjectileType<BoidMinion>();
-		}
-		
-		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback) {
-			// Here you can change where the minion is spawned. Most vanilla minions spawn at the cursor position
-			position = Main.MouseWorld;
-		}
-		
-		public override bool Shoot(Player player, ProjectileSource_Item_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) {
-			// This is needed so the buff that keeps your minion alive and allows you to despawn it properly applies
+
+			var spawnchance = random.Next(0, 100);
+
+			if (spawnchance > 3) return;
+
+			if (Main.LocalPlayer.ownedProjectileCounts[ModContent.ProjectileType<BoidMinion>()] >=
+			    player.GetModPlayer<CustomPlayer>().MaxBoidCount) return;
+			
+			var isTop = random.Next(0, 2);
+			Main.NewText(isTop);
+			var x = 0;
+			var y = 0;
+			var xSpeed = (float) random.NextDouble()*2-1;
+			var ySpeed = (float) random.NextDouble()*2-1;
+				
+			Main.NewText("xspeed" + xSpeed);
+			Main.NewText("yspeed" + ySpeed);
+				
+			if (isTop == 1)
+			{
+				x = random.Next(0, Main.screenWidth) + (int) player.position.X;
+				y = Main.screenHeight/2 + (int) player.position.Y-1;
+			}
+			else
+			{
+				x = Main.screenWidth/2 + (int) player.position.X-1;
+				y = random.Next(0, Main.screenHeight) + (int) player.position.Y;
+			}
 			player.AddBuff(Item.buffType, 2);
-	
-			// Minions have to be spawned manually, then have originalDamage assigned to the damage of the summon item
-			var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
-			projectile.originalDamage = Item.damage;
-	
-			// Since we spawned the projectile manually already, we do not need the game to spawn it for ourselves anymore, so return false
-			return false;
+				
+			Projectile.NewProjectile(player.GetProjectileSource_Item(Item), x, y, xSpeed, ySpeed,
+				ModContent.ProjectileType<BoidMinion>(), 0, 0, Main.myPlayer, 0f, 0f);
 		}
 
 		// Please see Content/ExampleRecipes.cs for a detailed explanation of recipe creation.

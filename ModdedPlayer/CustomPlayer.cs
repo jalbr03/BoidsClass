@@ -1,4 +1,5 @@
 ﻿using System;
+using Boids.DamageClasses;
 using Boids.Items.Accessories;
 using Boids.Projectiles.Minions;
 using Microsoft.Xna.Framework;
@@ -11,17 +12,35 @@ namespace Boids.ModdedPlayer
 {
     public class CustomPlayer : ModPlayer
     {
-        public int BaseMaxBoidCount = 100;
+        public int BaseMaxBoidCount = 300;
+        public int BaseMaxWallCount = 10;
         public int MaxBoidCount = 3;
         public int NextToGo = 0;
+        public bool hasBoidSet = false;
         private readonly string[] _accessoryIncrease = {new BoidIncreaseAccessoryLVL1().Name};
 
         public override void PreUpdate()
         {
             FixOverflow();
             UpdateAccessories();
+            CheckBoidSet();
         }
 
+        private void CheckBoidSet()
+        {
+            hasBoidSet = true;
+            for (int i = 0; i < 3; i++)
+            {
+                Terraria.Item currentAccessory = Main.LocalPlayer.armor[i];
+
+                if (currentAccessory.DamageType != ModContent.GetInstance<BoidDamageClass>())
+                {
+                    hasBoidSet = false;
+                    break;
+                }
+            }
+        }
+        
         private void UpdateAccessories()
         {
             int additionalSlots = 0;

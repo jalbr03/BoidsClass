@@ -53,18 +53,14 @@ namespace Boids.Items.Armor
 			if (spawnchance > 3) return;
 
 			if (Main.LocalPlayer.ownedProjectileCounts[ModContent.ProjectileType<BoidMinion>()] >=
-			    player.GetModPlayer<CustomPlayer>().MaxBoidCount) return;
+			    player.GetModPlayer<CustomPlayer>().MaxBoidCount-1) return;
 			
 			var isTop = random.Next(0, 2);
-			Main.NewText(isTop);
 			var x = 0;
 			var y = 0;
 			var xSpeed = (float) random.NextDouble()*2-1;
 			var ySpeed = (float) random.NextDouble()*2-1;
-				
-			Main.NewText("xspeed" + xSpeed);
-			Main.NewText("yspeed" + ySpeed);
-				
+
 			if (isTop == 1)
 			{
 				x = random.Next(0, Main.screenWidth) + (int) player.position.X;

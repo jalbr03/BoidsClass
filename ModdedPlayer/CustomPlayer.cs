@@ -17,6 +17,7 @@ namespace Boids.ModdedPlayer
         public int MaxBoidCount = 3;
         public int NextToGo = 0;
         public bool hasBoidSet = false;
+        public bool PullBoids = false;
         private readonly string[] _accessoryIncrease = {new BoidIncreaseAccessoryLVL1().Name};
 
         public override void PreUpdate()
@@ -24,8 +25,16 @@ namespace Boids.ModdedPlayer
             FixOverflow();
             UpdateAccessories();
             CheckBoidSet();
+            CheckBoidsAtract();
         }
 
+        private void CheckBoidsAtract()
+        {
+            if (PullBoids)
+            {
+                PullBoids = false;
+            }
+        }
         private void CheckBoidSet()
         {
             hasBoidSet = true;

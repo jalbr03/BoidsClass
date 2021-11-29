@@ -16,8 +16,13 @@ namespace Boids.Projectiles.Minions
 	{
 		private Random random = new Random();
 		private const float MaxDist = 15f;
+		private const float WallMaxDist = 65f;
 		private const float SeeingRange = 100f;
-		private const float SeeingAngle = 1.2f;
+		
+		private const float BoidAvoid = 30f;
+		private const float WallAvoid = 70f;
+		private const float Alignment = 1f;
+		private const float Cohesion = 0.01f;
 		private const float Speed = 3f;
 
 		private float tpBuffer = 24f;
@@ -89,50 +94,52 @@ namespace Boids.Projectiles.Minions
 
 		private void GeneralBehavior(Player owner, out Vector2 vectorToIdlePosition, out float distanceToIdlePosition)
 		{
-			vectorToIdlePosition = Vector2.Zero;//Projectile.Center;
-			distanceToIdlePosition = 0;//vectorToIdlePosition.Length();
+			vectorToIdlePosition = Vector2.Zero; //Projectile.Center;
+			distanceToIdlePosition = 0; //vectorToIdlePosition.Length();
 
 			var spawnchance = random.Next(0, 100);
 
 			if (spawnchance > 50) return;
-			
+
 			var avrageVelocityX = 0f;
 			var avrageVelocityY = 0f;
-			
+
 			var avragePositionX = 0f;
 			var avragePositionY = 0f;
 
 			var avragePushX = 0f;
 			var avragePushY = 0f;
 			var neighbors = 0;
-			
-			for (int i = 0; i < Main.maxProjectiles; i++) {
+			var walls = 0;
+
+			for (int i = 0; i < Main.maxProjectiles; i++)
+			{
 				Projectile other = Main.projectile[i];
-				
+
 				if (i != Projectile.whoAmI && other.active && other.owner == Projectile.owner)
 				{
 					var dist = Projectile.position.Distance(other.position);
 
 					var isWall = other.type == ModContent.ProjectileType<BoidWall>();
-					
-					if (dist < MaxDist)
+
+					if (dist < MaxDist || isWall && dist < WallMaxDist)
 					{
-						double distToOther = ExtraMath.PointDistance(Projectile.position, other.position);
-						double difx = Projectile.position.X - other.position.X+Math.Sign(other.position.X)*0.01;
-						double dify = Projectile.position.Y - other.position.Y+Math.Sign(other.position.Y)*0.01;
-						avragePushX += (float) (difx / distToOther) * (isWall ? 30:75);
-						avragePushY += (float) (dify / distToOther) * (isWall ? 30:75);
+						var distToOther = ExtraMath.PointDistance(Projectile.position, other.position);
+						var difx = Projectile.position.X - other.position.X;
+						var dify = Projectile.position.Y - other.position.Y;
+						avragePushX += (float) (difx / distToOther) * (isWall ? WallAvoid : BoidAvoid);
+						avragePushY += (float) (dify / distToOther) * (isWall ? WallAvoid : BoidAvoid);
+					}
+
+					if (isWall)
+					{
+						walls++;
+						continue;
 					}
 
 					if (dist <= SeeingRange)
 					{
 						neighbors++;
-					}
-
-					if (isWall) continue;
-
-					if (dist <= SeeingRange)
-					{
 						avrageVelocityX += other.velocity.X;
 						avrageVelocityY += other.velocity.Y;
 
@@ -144,31 +151,34 @@ namespace Boids.Projectiles.Minions
 
 			var targetVelX = Projectile.velocity.X;
 			var targetVelY = Projectile.velocity.Y;
-			
+
 			if (neighbors != 0)
 			{
 				avrageVelocityX /= neighbors;
 				avrageVelocityY /= neighbors;
-				
+
 				avragePositionX /= neighbors;
 				avragePositionY /= neighbors;
 				
-				avragePushX /= neighbors;
-				avragePushY /= neighbors;
-				
-				targetVelX += (avrageVelocityX - Projectile.velocity.X) / 1f;
-				targetVelY += (avrageVelocityY - Projectile.velocity.Y) / 1f;
-				
+				targetVelX += (avrageVelocityX - Projectile.velocity.X) * Alignment;
+				targetVelY += (avrageVelocityY - Projectile.velocity.Y) * Alignment;
+
 				var midX = avragePositionX - Projectile.position.X;
 				var midY = avragePositionY - Projectile.position.Y;
-				targetVelX += (midX - Projectile.velocity.X) * 0.01f;
-				targetVelY += (midY - Projectile.velocity.Y) * 0.01f;
+				targetVelX += (midX - Projectile.velocity.X) * Cohesion;
+				targetVelY += (midY - Projectile.velocity.Y) * Cohesion;
+			}
 
+			if (neighbors != 0 || walls != 0)
+			{
+				avragePushX /= neighbors + walls;
+				avragePushY /= neighbors + walls;
+				
 				targetVelX += avragePushX;
 				targetVelY += avragePushY;
 			}
 
-			// TODO: keep this code
+		// TODO: keep this code
 			// if (owner.position.Distance(Projectile.position) > tpMax)
 			// {
 			// 	targetVelX += (owner.Center.X - Projectile.position.X)/100f;
@@ -216,7 +226,8 @@ namespace Boids.Projectiles.Minions
 			// Starting search distance
 			distanceFromTarget = 700f;
 			targetCenter = Projectile.position;
-			foundTarget = false;
+			foundTarget = true;
+			Projectile.friendly = foundTarget;
 			return;
 			// This code is required if your minion weapon has the targeting feature
 			if (owner.HasMinionAttackTargetNPC) {

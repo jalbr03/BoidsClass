@@ -32,6 +32,8 @@ namespace Boids.ModdedPlayer
         {
             if (PullBoids)
             {
+                Main.NewText("right click!");
+                Main.LocalPlayer.statMana = 0;
                 PullBoids = false;
             }
         }

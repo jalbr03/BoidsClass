@@ -49,7 +49,7 @@ namespace Boids.Projectiles.Minions
 
 		// This is mandatory if your minion deals contact damage (further related stuff in AI() in the Movement region)
 		public override bool MinionContactDamage() {
-			return false;
+			return true;
 		}
 		
 		// The AI of this minion is split into multiple methods to avoid bloat. This method just passes values between calls actual parts of the AI.

@@ -72,9 +72,10 @@ namespace Boids.Items.Armor
 				y = random.Next(0, Main.screenHeight) + (int) player.position.Y;
 			}
 			player.AddBuff(Item.buffType, 2);
-				
+			
 			Projectile.NewProjectile(player.GetProjectileSource_Item(Item), x, y, xSpeed, ySpeed,
-				ModContent.ProjectileType<BoidMinion>(), 0, 0, Main.myPlayer, 0f, 0f);
+				ModContent.ProjectileType<BoidMinion>(), 10, 1, Main.myPlayer);
+			// TODO: change the damage and knock back i think to make them damage enemies
 		}
 
 		// Please see Content/ExampleRecipes.cs for a detailed explanation of recipe creation.

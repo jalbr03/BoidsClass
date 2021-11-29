@@ -28,7 +28,7 @@ namespace Boids.Items.weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 30;
+			Item.damage = 0;
 			Item.knockBack = 3f;
 			Item.mana = 0; // mana cost
 			Item.width = 32;
@@ -42,12 +42,16 @@ namespace Boids.Items.weapons
 			Item.autoReuse = true;
 
 			Item.noMelee = true; // this item doesn't do any melee damage
-			Item.DD2Summon = false;
+			// Item.DD2Summon = false;
 			Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); 
 			Item.buffType = ModContent.BuffType<BoidWallBuff>();
 
 			Item.shoot = ModContent.ProjectileType<BoidWall>(); // This item creates the minion projectile
 			
+		}
+
+		public override bool CanUseItem(Player player) {
+			return true;
 		}
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback) {
@@ -56,20 +60,15 @@ namespace Boids.Items.weapons
 		}
 	
 		public override bool Shoot(Player player, ProjectileSource_Item_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) {
-			// This is needed so the buff that keeps your minion alive and allows you to despawn it properly applies
 			player.AddBuff(Item.buffType, 2);
-	
-			// Minions have to be spawned manually, then have originalDamage assigned to the damage of the summon item
 			var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
 			projectile.originalDamage = Item.damage;
-	
-			// Since we spawned the projectile manually already, we do not need the game to spawn it for ourselves anymore, so return false
 			return false;
+			
 		}
-
+		
 		public override bool AltFunctionUse(Player player)
 		{
-			player.statMana = 0;
 			player.GetModPlayer<CustomPlayer>().PullBoids = true;
 			return true;
 		}

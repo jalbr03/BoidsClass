@@ -20,7 +20,7 @@ namespace Boids.Items.weapons
 		
 		public override void SetStaticDefaults() {
 			DisplayName.SetDefault("Staff of Boids");
-			Tooltip.SetDefault("Take control and make those mindless Boids Fight for YOU!"); // TODO: chang this!
+			Tooltip.SetDefault("Take control and make those mindless Boids Fight for YOU!");
 	
 			CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
 			ItemID.Sets.GamepadWholeScreenUseRange[Item.type] = true; // This lets the player target anywhere on the whole screen while using a controller
@@ -40,31 +40,65 @@ namespace Boids.Items.weapons
 			Item.value = Item.sellPrice(gold: 30);
 			Item.rare = ItemRarityID.White;
 			Item.UseSound = SoundID.Item44; // What sound should play when using the item
-			// Item.autoReuse = true;
+			Item.autoReuse = true;
 			
 
 			Item.noMelee = true; // this item doesn't do any melee damage
 			// Item.DD2Summon = false;
 			Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); 
-			Item.buffType = ModContent.BuffType<BoidWallBuff>();
+			// Item.buffType = ModContent.BuffType<BoidWallBuff>();
 
-			Item.shoot = ModContent.ProjectileType<BoidWall>(); // This item creates the minion projectile
+			// Item.shoot = ModContent.ProjectileType<BoidWall>(); // This item creates the minion projectile
 			
 		}
 
-		public override bool CanUseItem(Player player) {
-			if (player.altFunctionUse == 2)
-			{
-				Item.autoReuse = true;
-				Main.NewText("right click");
-			}else
-			{
-				Item.autoReuse = false;
-				Main.NewText("left click");
-				// item.shoot = /*projectile on left click*/;
-			}
+		// public override bool CanUseItem(Player player) {
+		// 	Main.NewText("click!");
+		// 	Main.NewText("player.altFunctionUse " + player.altFunctionUse);
+		// 	// if (player.altFunctionUse == 2)
+		// 	// {
+		// 	// 	Item.autoReuse = true;
+		// 	// 	Main.NewText("right click");
+		// 	// }else
+		// 	// {
+		// 	// 	Item.autoReuse = false;
+		// 	// 	Main.NewText("left click");
+		// 	// 	// item.shoot = /*projectile on left click*/;
+		// 	// }
+		//
+		// 	return base.CanUseItem(player);
+		// }
 
-			return base.CanUseItem(player);
+		// public override bool? UseItem(Player player)
+		// {
+		// 	Main.NewText("click!");
+		// 	Main.NewText("player.altFunctionUse " + player.altFunctionUse);
+		// 	if (player.altFunctionUse == 2)
+		// 	{
+		// 		// Item.autoReuse = true;
+		// 		// Main.NewText("right click");
+		// 	}
+		// 	else
+		// 	{
+		// 		// Item.autoReuse = false;
+		// 		// Main.NewText("left click");
+		// 		// item.shoot = /*projectile on left click*/;
+		// 	}
+		//
+		// 	return base.UseItem(player);
+		// }
+
+		public override void HoldItem(Player player)
+		{
+			if (Main.mouseLeft)
+			{
+				Main.NewText("left");
+			}
+			
+			if (Main.mouseRight)
+			{
+				Main.NewText("right");
+			}
 		}
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback) {

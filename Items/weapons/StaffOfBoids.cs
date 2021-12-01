@@ -44,10 +44,10 @@ namespace Boids.Items.weapons
 
 			Item.noMelee = true; // this item doesn't do any melee damage
 			// Item.DD2Summon = false;
-			// Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); 
-			// Item.buffType = ModContent.BuffType<BoidWallBuff>();
+			Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); 
+			Item.buffType = ModContent.BuffType<BoidWallBuff>();
 
-			// Item.shoot = ModContent.ProjectileType<BoidWall>(); // This item creates the minion projectile
+			Item.shoot = ModContent.ProjectileType<BoidWall>(); // This item creates the minion projectile
 			
 		}
 
@@ -60,18 +60,18 @@ namespace Boids.Items.weapons
 			position = Main.MouseWorld;
 		}
 
-		public override void Update(ref float gravity, ref float maxFallSpeed)
-		{
-			
-		}
+		// public override void Update(ref float gravity, ref float maxFallSpeed)
+		// {
+		// 	
+		// }
 
 		public override bool Shoot(Player player, ProjectileSource_Item_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) {
 			player.AddBuff(ModContent.BuffType<BoidWallBuff>(), 2);
 			Main.NewText("left click");
-			Projectile.NewProjectile(player.GetProjectileSource_Item(Item), position.X, position.Y, 0, 0,
-				ModContent.ProjectileType<BoidWall>(), 10, 1, Main.myPlayer);
-			// var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
-			// projectile.originalDamage = Item.damage;
+			// Projectile.NewProjectile(player.GetProjectileSource_Item(Item), position.X, position.Y, 0, 0,
+			// 	ModContent.ProjectileType<BoidWall>(), 10, 1, Main.myPlayer);
+			var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
+			projectile.originalDamage = Item.damage;
 			
 			return false;
 			
@@ -79,6 +79,7 @@ namespace Boids.Items.weapons
 		
 		public override bool AltFunctionUse(Player player)
 		{
+			Main.NewText("right click");
 			player.GetModPlayer<CustomPlayer>().PullBoids = true;
 			return true;
 		}

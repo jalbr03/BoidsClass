@@ -10,6 +10,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.UI;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Boids.Items.weapons
@@ -43,10 +44,10 @@ namespace Boids.Items.weapons
 
 			Item.noMelee = true; // this item doesn't do any melee damage
 			// Item.DD2Summon = false;
-			Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); 
-			Item.buffType = ModContent.BuffType<BoidWallBuff>();
+			// Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); 
+			// Item.buffType = ModContent.BuffType<BoidWallBuff>();
 
-			Item.shoot = ModContent.ProjectileType<BoidWall>(); // This item creates the minion projectile
+			// Item.shoot = ModContent.ProjectileType<BoidWall>(); // This item creates the minion projectile
 			
 		}
 
@@ -58,11 +59,20 @@ namespace Boids.Items.weapons
 			// Here you can change where the minion is spawned. Most vanilla minions spawn at the cursor position
 			position = Main.MouseWorld;
 		}
-	
+
+		public override void Update(ref float gravity, ref float maxFallSpeed)
+		{
+			
+		}
+
 		public override bool Shoot(Player player, ProjectileSource_Item_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) {
-			player.AddBuff(Item.buffType, 2);
-			var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
-			projectile.originalDamage = Item.damage;
+			player.AddBuff(ModContent.BuffType<BoidWallBuff>(), 2);
+			Main.NewText("left click");
+			Projectile.NewProjectile(player.GetProjectileSource_Item(Item), position.X, position.Y, 0, 0,
+				ModContent.ProjectileType<BoidWall>(), 10, 1, Main.myPlayer);
+			// var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
+			// projectile.originalDamage = Item.damage;
+			
 			return false;
 			
 		}

@@ -3,6 +3,7 @@ using System;
 using Boids.Buffs;
 using Boids.DamageClasses;
 using Boids.General;
+using Boids.ModdedPlayer;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
@@ -17,12 +18,13 @@ namespace Boids.Projectiles.Minions
 		private Random random = new Random();
 		private const float MaxDist = 15f;
 		private const float WallMaxDist = 65f;
-		private const float SeeingRange = 100f;
+		private const float SeeingRange = 50f;
 		
-		private const float BoidAvoid = 30f;
+		private const float BoidAvoid = 50f;
 		private const float WallAvoid = 70f;
-		private const float Alignment = 1f;
+		private const float Alignment = 0.8f;
 		private const float Cohesion = 0.01f;
+		private const float CursorAttraction = 0.02f;
 		private const float Speed = 3f;
 
 		private float tpBuffer = 24f;
@@ -177,6 +179,16 @@ namespace Boids.Projectiles.Minions
 				targetVelX += avragePushX;
 				targetVelY += avragePushY;
 			}
+
+			if (Main.LocalPlayer.GetModPlayer<CustomPlayer>().PullBoids)
+			{
+				var mouse = Main.MouseWorld;
+				targetVelX += (mouse.X - Projectile.position.X) * CursorAttraction;
+				targetVelY += (mouse.Y - Projectile.position.Y) * CursorAttraction;
+			}
+
+			random.Next(0, 100);
+			
 
 		// TODO: keep this code
 			// if (owner.position.Distance(Projectile.position) > tpMax)

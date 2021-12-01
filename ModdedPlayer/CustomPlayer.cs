@@ -25,17 +25,6 @@ namespace Boids.ModdedPlayer
             FixOverflow();
             UpdateAccessories();
             CheckBoidSet();
-            CheckBoidsAtract();
-        }
-
-        private void CheckBoidsAtract()
-        {
-            if (PullBoids)
-            {
-                Main.NewText("right click!");
-                Main.LocalPlayer.statMana = 0;
-                PullBoids = false;
-            }
         }
         private void CheckBoidSet()
         {

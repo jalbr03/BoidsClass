@@ -17,7 +17,9 @@ namespace Boids.Items.weapons
 {
     public class StaffOfBoids : ModItem
 	{
-		
+		private float _usingTime = 0f;
+		private const float MaxUsingTime = 0.1f;
+
 		public override void SetStaticDefaults() {
 			DisplayName.SetDefault("Staff of Boids");
 			Tooltip.SetDefault("Take control and make those mindless Boids Fight for YOU!");
@@ -29,15 +31,15 @@ namespace Boids.Items.weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 0;
-			Item.knockBack = 3f;
+			// Item.damage = 0;
+			// Item.knockBack = 3f;
 			Item.mana = 0; // mana cost
 			Item.width = 32;
 			Item.height = 32;
-			Item.useTime = 5;
-			Item.useAnimation = 5;
+			Item.useTime = 15;
+			Item.useAnimation = 15;
 			Item.useStyle = ItemUseStyleID.Swing; // how the player's arm moves when using the item
-			Item.value = Item.sellPrice(gold: 30);
+			Item.value = Item.sellPrice(silver: 10);
 			Item.rare = ItemRarityID.White;
 			Item.UseSound = SoundID.Item44; // What sound should play when using the item
 			Item.autoReuse = true;
@@ -45,7 +47,7 @@ namespace Boids.Items.weapons
 
 			Item.noMelee = true; // this item doesn't do any melee damage
 			// Item.DD2Summon = false;
-			Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); 
+			// Item.DamageType = ModContent.GetInstance<BoidDamageClass>(); 
 			// Item.buffType = ModContent.BuffType<BoidWallBuff>();
 
 			// Item.shoot = ModContent.ProjectileType<BoidWall>(); // This item creates the minion projectile
@@ -90,14 +92,31 @@ namespace Boids.Items.weapons
 
 		public override void HoldItem(Player player)
 		{
+			// Main.NewText("PullBoids " + Main.LocalPlayer.GetModPlayer<CustomPlayer>().PullBoids);
+			if (_usingTime > 0)
+			{
+				_usingTime -= 1.0f/Main.frameRate;
+				return;
+			}
+
+			_usingTime = MaxUsingTime;
 			if (Main.mouseLeft)
 			{
-				Main.NewText("left");
+				player.AddBuff(ModContent.BuffType<BoidWallBuff>(), 2);
+				var position = Main.MouseWorld;
+				Projectile.NewProjectile(player.GetProjectileSource_Item(Item), position.X, position.Y, 0, 0,
+					ModContent.ProjectileType<BoidWall>(), 0, 0, Main.myPlayer);
+				// var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
 			}
 			
-			if (Main.mouseRight)
+			if (Main.mouseRight && player.statMana >= Item.mana)
 			{
-				Main.NewText("right");
+				player.statMana -= Item.mana;
+				Main.LocalPlayer.GetModPlayer<CustomPlayer>().PullBoids = true;
+			}
+			else
+			{
+				Main.LocalPlayer.GetModPlayer<CustomPlayer>().PullBoids = false;
 			}
 		}
 

@@ -40,7 +40,8 @@ namespace Boids.Items.weapons
 			Item.value = Item.sellPrice(gold: 30);
 			Item.rare = ItemRarityID.White;
 			Item.UseSound = SoundID.Item44; // What sound should play when using the item
-			Item.autoReuse = true;
+			// Item.autoReuse = true;
+			
 
 			Item.noMelee = true; // this item doesn't do any melee damage
 			// Item.DD2Summon = false;
@@ -52,7 +53,18 @@ namespace Boids.Items.weapons
 		}
 
 		public override bool CanUseItem(Player player) {
-			return true;
+			if (player.altFunctionUse == 2)
+			{
+				Item.autoReuse = true;
+				Main.NewText("right click");
+			}else
+			{
+				Item.autoReuse = false;
+				Main.NewText("left click");
+				// item.shoot = /*projectile on left click*/;
+			}
+
+			return base.CanUseItem(player);
 		}
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback) {
@@ -66,23 +78,30 @@ namespace Boids.Items.weapons
 		// }
 
 		public override bool Shoot(Player player, ProjectileSource_Item_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) {
-			player.AddBuff(ModContent.BuffType<BoidWallBuff>(), 2);
-			Main.NewText("left click");
-			// Projectile.NewProjectile(player.GetProjectileSource_Item(Item), position.X, position.Y, 0, 0,
-			// 	ModContent.ProjectileType<BoidWall>(), 10, 1, Main.myPlayer);
-			var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
-			projectile.originalDamage = Item.damage;
+			// if(player.altFunctionUse == 2)
+			// {
+			// 	// Main.NewText("right click");
+			// }else{
+			// 	Main.NewText("left click");
+			// }
+			
+			// player.AddBuff(ModContent.BuffType<BoidWallBuff>(), 2);
+			// Main.NewText("left click");
+			// // Projectile.NewProjectile(player.GetProjectileSource_Item(Item), position.X, position.Y, 0, 0,
+			// // 	ModContent.ProjectileType<BoidWall>(), 10, 1, Main.myPlayer);
+			// var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
+			// projectile.originalDamage = Item.damage;
 			
 			return false;
 			
 		}
 		
-		public override bool AltFunctionUse(Player player)
-		{
-			Main.NewText("right click");
-			player.GetModPlayer<CustomPlayer>().PullBoids = true;
-			return true;
-		}
+		// public override bool AltFunctionUse(Player player)
+		// {
+		// 	Main.NewText("right click");
+		// 	player.GetModPlayer<CustomPlayer>().PullBoids = true;
+		// 	return true;
+		// }
 
 		public override void AddRecipes() {
 			CreateRecipe()
